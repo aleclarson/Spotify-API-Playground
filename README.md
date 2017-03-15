@@ -1,5 +1,6 @@
 # Spotify API Playground
 
+
 These examples cover:
 
 * Successful OAuth
@@ -19,6 +20,7 @@ Once installed, clone the repository and install its dependencies running:
 
     $ npm install
 
+	
 ## Running the Playground
 In order to run the Playground, CD to the the 'API Playground' directory in the folder you cloned to and run app.js with node
 
@@ -35,4 +37,4 @@ Go to [My Applications on Spotify Developer](https://developer.spotify.com/my-ap
 * http://localhost:8888 (needed for the implicit grant flow)
 * http://localhost:8888/callback
 
-Once you have created your app, replace the `client_id`, `redirect_uri` and `client_secret` in the app.js with the ones you get from My Applications.
+Once you have created your app, replace the `client_id`, `redirect_uri` and `client_secret` in the examples with the ones you get from My Applications.
