@@ -88,6 +88,9 @@
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script>
 
+	var uid;
+	
+	
 	 /**
      * Obtains parameters from the hash of the URL
      * @return Object
@@ -140,6 +143,8 @@
                 },
                 success: function(response) {
                   userProfilePlaceholder.innerHTML = userProfileTemplate(response);
+				  uid = response.id;
+				  
 
                   $('#login').hide();
                   $('#loggedin').show();
