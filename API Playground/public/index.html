@@ -42,14 +42,23 @@
 		</div>
         <div id="user-profile">
         </div>
-		<div id="generate-playlist">
-		<button onclick="generatePlaylist()">Generate Playlist</button>
+
+
+
+		      <h2>Top Artists</h2>
+	  <button onclick="generatePlaylist()">Generate Playlist</button>
+	  		<div id="user-playlist-generated">
 		</div>
+	  		
 		<div id="user-top-artists">
         </div>
-		<div id="user-top-tracks">
+		<br><br><br><br><br>
+		 <h2>Top Tracks</h2>
+			  <button onclick="generatePlaylist()">Generate Playlist</button>
+					<div id="user-top-tracks">
         </div>
-		<br><br><br>
+		
+
         <div id="oauth">
         </div>
         <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
@@ -77,18 +86,20 @@
     </script>
 	
 	<script id="user-top-artists-template" type="text/x-handlebars-template">
-      <h2>Top Artists</h2>
+
+
+		<br></br></br>
 		 {{#each items}}
-		<h2 >{{name}}</h2>
+		<h3 >{{name}}</h3>
 		<img class="media-object floating-box" width="150" src="{{images.0.url}}" />
 		{{/each}}
     </script>
+	
 		
 	<script id="user-top-tracks-template" type="text/x-handlebars-template">
-      <br><br><br><br><br>
-	  <h2>Top Tracks</h2>
+      <br><br>
 		 {{#each items}}
-		<li>{{name}} -  {{artists.0.name}}</li>
+		 		<li>{{name}} -  {{artists.0.name}}</li>
 		{{/each}}
     </script>
 	
@@ -105,10 +116,10 @@
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script>
 
+	var artistIds = new Array();
 	var uid;
-it
-	
-	
+	var playlistId;
+
 	 /**
      * Obtains parameters from the hash of the URL
      * @return Object
@@ -128,10 +139,15 @@ it
       var access_token = params.access_token,
           refresh_token = params.refresh_token,
           error = params.error;
+		  
+		  
 
 		var userTopArtistsSource = document.getElementById('user-top-artists-template').innerHTML,
             userTopArtistsTemplate = Handlebars.compile(userTopArtistsSource),
             userTopArtistsPlaceholder = document.getElementById('user-top-artists');
+			
+
+            userTopArtistsPlaylistPlaceholder = document.getElementById('user-playlist-generated');
 	  
 	    var userTopTracksSource = document.getElementById('user-top-tracks-template').innerHTML,
             userTopTracksTemplate = Handlebars.compile(userTopTracksSource),
@@ -175,15 +191,7 @@ it
               $('#loggedin').hide();
           }
 		  
-		  $.ajax({
-                url: 'https://api.spotify.com/v1/me/top/tracks',
-                headers: {
-                  'Authorization': 'Bearer ' + access_token
-                },
-                success: function(response) {
-                  userTopTracksPlaceholder.innerHTML = userTopTracksTemplate(response);
-                }
-            });
+
 			
 		$.ajax({
                 url: 'https://api.spotify.com/v1/me/top/artists?limit=5',
@@ -198,10 +206,8 @@ it
 						artistIds[i] = this.id;							
 						i++;
 					});
-        });
-                }
-		
-		console.log(artistIds);
+					}
+					});
 
           document.getElementById('obtain-new-token').addEventListener('click', function() {
             $.ajax({
@@ -227,12 +233,87 @@ it
                   'Authorization': 'Bearer ' + access_token
                 },
 				type: "POST",
-				data: '{"name": "Test Playlist 1","public": false}',
+				data: '{"name": "Fave Artists List","public": false}',
                 success: function(response) {
-				  console.log("Playlist Generated");
+				  playlistId = response.id;
+				  getArtistsTopTracks();
                 }
             });
 			}
+			
+			
+			
+	  function getArtistsTopTracks(){
+			
+			console.log ("Playlist ID: " + playlistId);
+			console.log ("User ID: " + uid);
+	  
+			var numOfArtists = artistIds.length;
+			
+			var artistsTracks = new Array();
+			
+			var artistTrackId;
+			
+						
+			for (i = 0; i < numOfArtists; i++){
+			
+				$.ajax({
+                url: 'https://api.spotify.com/v1/artists/' + artistIds[i] + '/top-tracks?country=ES',
+                headers: {
+                },
+                  'Authorization': 'Bearer ' + access_token,	  
+                success: function(response) {
+					var j = 0;
+					$(response.tracks).each(
+						function(){						
+						artistsTracks[i] = this.uri;
+						artistTrackName = this.name;
+						artistName = this.artists[0].name;
+						artistTrackId = this.uri;				
+						if (j < 5){
+							fillFavePlaylist(i, artistTrackId);	
+                            userTopArtistsPlaylistPlaceholder.innerHTML += "<li>" + artistName + " - " + artistTrackName + "</li>";						
+						}				
+							j++;
+					});	
+                }
+            });  
+            }
+		}
+		
+		
+		function fillFavePlaylist(trackNumber, trackId){
+		
+					 $.ajax({
+							url: 'https://api.spotify.com/v1/users/' + uid + '/playlists/' +  playlistId + '/tracks?position=0&uris=' + trackId ,
+							headers: {
+							'Authorization': 'Bearer ' + access_token
+							},
+							async: false,
+							type: 'POST',
+							success: function(response) {
+							console.log("track added");
+							}
+						});
+
+		
+		}
+		
+		
+		
+		$.ajax({
+                url: 'https://api.spotify.com/v1/me/top/tracks',
+                headers: {
+                  'Authorization': 'Bearer ' + access_token
+                },
+                success: function(response) {
+                  userTopTracksPlaceholder.innerHTML = userTopTracksTemplate(response);
+
+                }
+            });
+	
+	
+
 	  
     </script>
   </body>
