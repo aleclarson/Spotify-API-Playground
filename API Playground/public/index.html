@@ -160,6 +160,19 @@
                   userTopTracksPlaceholder.innerHTML = userTopTracksTemplate(response);
                 }
             });
+			
+			
+		  $.ajax({
+                url: 'https://api.spotify.com/v1/me/top/artists?limit=5',
+                headers: {
+                  'Authorization': 'Bearer ' + access_token
+                },
+                success: function(response) {
+				  console.log = response.items[0].id;
+                }
+            });
+			
+			
 
           document.getElementById('obtain-new-token').addEventListener('click', function() {
             $.ajax({
@@ -176,6 +189,11 @@
             });
           }, false);
         }
+		
+	 
+	 function lookInside(item, index){
+		console.log(item);
+	 }
       
 	  	
 	  function generatePlaylist(){
