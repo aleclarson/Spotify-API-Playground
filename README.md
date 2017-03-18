@@ -6,6 +6,8 @@ These examples cover:
 * Successful OAuth
 * Fetching and displaying user profile data
 * Fetching and displaying users top tracks
+* Fetch and display current users top tracks
+
 
 ## Installation
 
