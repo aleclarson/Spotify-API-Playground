@@ -13,6 +13,14 @@
         white-space: nowrap;
         width: 500px;
       }
+	  
+	  .floating-box {
+    float: left;
+    width: 150px;
+    height: 100px;
+    margin: 5px;
+    border: 3px solid #000000;  
+}
     </style>
   </head>
 
@@ -37,6 +45,8 @@
 		<div id="generate-playlist">
 		<button onclick="generatePlaylist()">Generate Playlist</button>
 		</div>
+		<div id="user-top-artists">
+        </div>
 		<div id="user-top-tracks">
         </div>
 		<br><br><br>
@@ -66,13 +76,20 @@
       </div>
     </script>
 	
+	<script id="user-top-artists-template" type="text/x-handlebars-template">
+      <h2>Top Artists</h2>
+		 {{#each items}}
+		<h2 >{{name}}</h2>
+		<img class="media-object floating-box" width="150" src="{{images.0.url}}" />
+		{{/each}}
+    </script>
+		
 	<script id="user-top-tracks-template" type="text/x-handlebars-template">
-      <h2>Top Tracks</h2>
-	 
+      <br><br><br><br><br>
+	  <h2>Top Tracks</h2>
 		 {{#each items}}
 		<li>{{name}} -  {{artists.0.name}}</li>
 		{{/each}}
-  
     </script>
 	
 
@@ -89,6 +106,7 @@
     <script>
 
 	var uid;
+it
 	
 	
 	 /**
@@ -101,7 +119,6 @@
         q = window.location.hash.substring(1);
       while ( e = r.exec(q)) {
         hashParams[e[1]] = decodeURIComponent(e[2]);
-		console.log(decodeURIComponent(e[2]));
         }
         return hashParams;
       }
@@ -112,7 +129,9 @@
           refresh_token = params.refresh_token,
           error = params.error;
 
-	 
+		var userTopArtistsSource = document.getElementById('user-top-artists-template').innerHTML,
+            userTopArtistsTemplate = Handlebars.compile(userTopArtistsSource),
+            userTopArtistsPlaceholder = document.getElementById('user-top-artists');
 	  
 	    var userTopTracksSource = document.getElementById('user-top-tracks-template').innerHTML,
             userTopTracksTemplate = Handlebars.compile(userTopTracksSource),
@@ -165,6 +184,24 @@
                   userTopTracksPlaceholder.innerHTML = userTopTracksTemplate(response);
                 }
             });
+			
+		$.ajax({
+                url: 'https://api.spotify.com/v1/me/top/artists?limit=5',
+                headers: {
+                  'Authorization': 'Bearer ' + access_token
+                },
+                success: function(response) {
+					userTopArtistsPlaceholder.innerHTML = userTopArtistsTemplate(response);
+					var i = 0;
+					$(response.items).each(
+						function(){	
+						artistIds[i] = this.id;							
+						i++;
+					});
+        });
+                }
+		
+		console.log(artistIds);
 
           document.getElementById('obtain-new-token').addEventListener('click', function() {
             $.ajax({
