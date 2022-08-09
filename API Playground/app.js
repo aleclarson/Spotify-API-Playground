@@ -12,9 +12,14 @@ var request = require('request'); // "Request" library
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 
-var client_id = '1d9dca3a687547c09fa57aae1331d63c'; // Your client id
-var client_secret = 'fb67ffa39b1549e3bddedd89a7d0b81c'; // Your secret
-var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+// use ngrok package to create a tunnel to localhost
+var ngrok = require('ngrok');
+ngrok.connect(8888).then(ngrokUrl => {
+console.log({ngrokUrl})
+
+var client_id = 'e755761dd1654d3ca8bb5cb951e7b185'; // Your client id
+var client_secret = '3cf6f84cfa0846b4b40ab029c1ef2afb'; // Your secret
+var redirect_uri = ngrokUrl + '/callback'; // Your redirect uri
 
 /**
  * Generates a random string containing numbers and letters
@@ -143,3 +148,4 @@ app.get('/refresh_token', function(req, res) {
 
 console.log('Listening on 8888');
 app.listen(8888);
+})
